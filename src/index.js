@@ -61,6 +61,15 @@ registerBlockType( 'create-block/richtext-paste-filter', {
 	icon: 'smiley',
 
 	/**
+	 * Set the attributes this block is dependant on.
+	 */
+	attributes: {
+		content: {
+			type: 'string',
+		}
+	},
+
+	/**
 	 * Optional block extended support features.
 	 */
 	supports: {

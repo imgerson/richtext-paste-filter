@@ -4,6 +4,7 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * The save function defines the way in which the different attributes should
@@ -16,11 +17,6 @@ import { __ } from '@wordpress/i18n';
  */
 export default function save() {
 	return (
-		<p>
-			{ __(
-				'Richtext Paste Filter – hello from the saved content!',
-				'richtext-paste-filter'
-			) }
-		</p>
+		<RichText.Content />
 	);
 }

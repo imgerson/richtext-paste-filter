@@ -4,6 +4,7 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -24,13 +25,44 @@ import './editor.scss';
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit( { className } ) {
+export default function Edit( { attributes, setAttributes, className } ) {
+	const handleChange = ( content ) => {
+		setAttributes( { content } );
+	};
+
+	const updateContent = async ( content ) => {
+		return content.toUpperCase();
+	}
+
+	const target = document.querySelector( `.${className}` );
+
+	if (target) {
+		target.onpaste = ( event ) => {
+			event.preventDefault();
+			return false;
+		}
+
+		target.addEventListener( 'paste', ( event ) => {
+			let paste = (event.clipboardData || window.clipboardData).getData('text');
+			
+			updateContent( paste ).then( ( contentUpdated ) => {
+				const selection = window.getSelection();
+
+				if (!selection.rangeCount) {
+					return false;
+				}
+		
+				selection.deleteFromDocument();
+				selection.getRangeAt(0).insertNode(document.createTextNode(contentUpdated));
+			} );
+		} );
+	}
+
 	return (
-		<p className={ className }>
-			{ __(
-				'Richtext Paste Filter – hello from the editor!',
-				'richtext-paste-filter'
-			) }
-		</p>
+		<RichText
+			value={ attributes.content }
+			onChange={ handleChange }
+			className={ className }
+		/>
 	);
 }
