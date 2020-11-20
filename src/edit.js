@@ -31,28 +31,36 @@ export default function Edit( { attributes, setAttributes, className } ) {
 	};
 
 	const updateContent = async ( content ) => {
-		return content.toUpperCase();
+		const contentParsedFromString = new DOMParser().parseFromString(
+			content,
+			'text/html'
+		);
+	
+		return contentParsedFromString.body.textContent || html;
 	}
 
 	const target = document.querySelector( `.${className}` );
 
 	if (target) {
-		target.onpaste = ( event ) => {
-			event.preventDefault();
-			return false;
-		}
-
 		target.addEventListener( 'paste', ( event ) => {
+			event.preventDefault();
+
 			let paste = (event.clipboardData || window.clipboardData).getData('text');
 			
 			updateContent( paste ).then( ( contentUpdated ) => {
-				const selection = window.getSelection();
+				const range = document.createRange();
+				const textNode = target.childNodes[0];
 
-				if (!selection.rangeCount) {
-					return false;
-				}
-		
+				const pastedContentPosition = target.innerHTML.indexOf(paste);
+
+				range.setStart(textNode, pastedContentPosition);
+				range.setEnd(textNode, pastedContentPosition + paste.length);
+
+				const selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange(range);
 				selection.deleteFromDocument();
+
 				selection.getRangeAt(0).insertNode(document.createTextNode(contentUpdated));
 			} );
 		} );
